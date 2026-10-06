@@ -1,10 +1,44 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="btb-hero text-center">
+    <h1>Break the bot. <span class="btb-accent">Then fix it.</span></h1>
+    <p class="lead text-secondary mx-auto" style="max-width: 640px;">
+        A hands-on lab for the OWASP Top 10 for LLM Applications. Attack deliberately vulnerable
+        AI apps, capture the flag, learn why it worked, then switch on a defense and try again.
+    </p>
+</section>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-5">
+    @foreach (var item in Model.Items)
+    {
+        <div class="col">
+            <div class="btb-card @(item.IsPlayable ? "btb-card-playable" : "btb-card-soon")">
+                @if (item.IsPlayable)
+                {
+                    <span class="btb-badge btb-badge-playable">Playable</span>
+                }
+                else
+                {
+                    <span class="btb-badge btb-badge-soon">🔒 Coming soon</span>
+                }
+                <h5><span class="btb-accent">@item.Code</span> @item.Title</h5>
+                <p>@item.Blurb</p>
+                @if (item.IsPlayable)
+                {
+                    if (Model.LevelsEnabled)
+                    {
+                        <a class="btn btn-primary btn-sm" href="/Levels/Play?id=@item.LevelNumber">Open level @item.LevelNumber</a>
+                    }
+                    else
+                    {
+                        <span class="text-secondary small">Level @item.LevelNumber</span>
+                    }
+                }
+            </div>
+        </div>
+    }
 </div>

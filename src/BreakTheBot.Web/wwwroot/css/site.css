@@ -1,22 +1,126 @@
-html {
-  font-size: 14px;
-}
+[data-bs-theme="dark"] {
+  --btb-bg: #0d1117;
+  --btb-panel: #161b22;
+  --btb-border: #30363d;
+  --btb-text: #e6edf3;
+  --btb-muted: #8b949e;
+  --btb-accent: #2dd4bf;
+  --btb-success: #3fb950;
+  --btb-danger: #f85149;
+  --btb-warning: #d29922;
+  --btb-mono: ui-monospace, "Cascadia Code", Consolas, "Courier New", monospace;
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+  --bs-body-bg: var(--btb-bg);
+  --bs-body-bg-rgb: 13, 17, 23;
+  --bs-body-color: var(--btb-text);
+  --bs-body-color-rgb: 230, 237, 243;
+  --bs-secondary-color: var(--btb-muted);
+  --bs-border-color: var(--btb-border);
+  --bs-link-color-rgb: 45, 212, 191;
+  --bs-link-hover-color-rgb: 94, 234, 212;
 }
 
 body {
-  margin-bottom: 60px;
+  background-color: var(--btb-bg);
+  color: var(--btb-text);
+}
+
+/* Navbar */
+.btb-nav {
+  background-color: var(--btb-panel);
+  border-bottom: 1px solid var(--btb-border);
+}
+.btb-brand {
+  font-family: var(--btb-mono);
+  font-weight: 700;
+  color: var(--btb-text) !important;
+}
+.btb-brand-mark {
+  color: var(--btb-accent);
+}
+.btb-nav .nav-link {
+  color: var(--btb-muted);
+}
+.btb-nav .nav-link:hover {
+  color: var(--btb-accent);
+}
+
+/* Footer */
+.btb-footer {
+  border-top: 1px solid var(--btb-border);
+  color: var(--btb-muted);
+  font-size: 0.85rem;
+  padding: 1rem 0;
+}
+
+/* Hero */
+.btb-hero {
+  padding: 3rem 0 2rem;
+}
+.btb-hero h1 {
+  font-family: var(--btb-mono);
+  font-weight: 700;
+}
+.btb-accent {
+  color: var(--btb-accent);
+}
+
+/* Cards */
+.btb-card {
+  background-color: var(--btb-panel);
+  border: 1px solid var(--btb-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  height: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.btb-card-playable:hover {
+  border-color: var(--btb-accent);
+  box-shadow: 0 0 0 1px var(--btb-accent), 0 0 18px rgba(45, 212, 191, 0.15);
+}
+.btb-card-soon {
+  opacity: 0.55;
+}
+.btb-card h5 {
+  font-family: var(--btb-mono);
+  font-size: 1rem;
+}
+.btb-card p {
+  color: var(--btb-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Badges */
+.btb-badge {
+  display: inline-block;
+  font-family: var(--btb-mono);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--btb-border);
+  margin-bottom: 0.6rem;
+}
+.btb-badge-playable {
+  color: var(--btb-accent);
+  border-color: var(--btb-accent);
+}
+.btb-badge-soon {
+  color: var(--btb-muted);
+}
+
+/* Buttons */
+.btn-primary {
+  --bs-btn-bg: var(--btb-accent);
+  --bs-btn-border-color: var(--btb-accent);
+  --bs-btn-color: #0d1117;
+  --bs-btn-hover-bg: #5eead4;
+  --bs-btn-hover-border-color: #5eead4;
+  --bs-btn-hover-color: #0d1117;
+  --bs-btn-active-bg: #14b8a6;
+  --bs-btn-active-border-color: #14b8a6;
+  --bs-btn-active-color: #0d1117;
+}
+.btn-outline-light {
+  --bs-btn-border-color: var(--btb-border);
 }
