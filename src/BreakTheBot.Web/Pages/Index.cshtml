@@ -29,13 +29,13 @@
                 <p>@item.Blurb</p>
                 @if (item.IsPlayable)
                 {
-                    if (Model.LevelsEnabled)
+                    if (Model.IsOpen(item.LevelNumber!.Value))
                     {
                         <a class="btn btn-primary btn-sm" href="/Levels/Play?id=@item.LevelNumber">Open level @item.LevelNumber</a>
                     }
                     else
                     {
-                        <span class="text-secondary small">Level @item.LevelNumber</span>
+                        <span class="text-secondary small">Level @item.LevelNumber (building soon)</span>
                     }
                 }
             </div>

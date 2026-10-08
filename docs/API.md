@@ -75,7 +75,7 @@ Response `200`
   "blocked": false,
   "exploitDetected": true,
   "usage": { "inputTokens": 214, "outputTokens": 31 },
-  "quota": { "userRemainingToday": 37, "userRemainingThisMinute": 9 }
+  "quota": { "userRemainingToday": 37 }
 }
 ```
 

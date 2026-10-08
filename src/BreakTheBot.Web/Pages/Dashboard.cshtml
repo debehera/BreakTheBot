@@ -1,0 +1,59 @@
+@page
+@using BreakTheBot.Web.Data
+@using BreakTheBot.Web.Levels
+@model DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var pct = (int)Math.Round(100.0 * Model.TotalPoints / DashboardModel.MaxPoints);
+}
+@functions {
+    static string StatusCss(LevelStatus s) => s switch
+    {
+        LevelStatus.InProgress => "btb-status-progress",
+        LevelStatus.Captured => "btb-status-captured",
+        LevelStatus.Defended => "btb-status-defended",
+        _ => "btb-status-not"
+    };
+    static string StatusLabel(LevelStatus s) => s switch
+    {
+        LevelStatus.InProgress => "In progress",
+        LevelStatus.Captured => "Captured",
+        LevelStatus.Defended => "Defended",
+        _ => "Not started"
+    };
+}
+
+<div class="pt-4 pb-3">
+    <h2 class="mb-3" style="font-family: var(--btb-mono);">Your progress</h2>
+    <div class="btb-panel mb-4">
+        <div class="d-flex justify-content-between mb-2">
+            <span>Score</span>
+            <strong>@Model.TotalPoints / @DashboardModel.MaxPoints</strong>
+        </div>
+        <div class="progress" role="progressbar" aria-label="Score progress" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" style="width: @pct%"></div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr><th>#</th><th>Level</th><th>OWASP</th><th>Status</th><th class="text-end">Points</th><th></th></tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    <td>@row.Level.Id</td>
+                    <td>@row.Level.Codename @if (row.Level.Kind == LevelKind.Lighter) { <span class="btb-badge btb-badge-soon ms-1">lighter</span> }</td>
+                    <td><span class="btb-accent">@row.Level.OwaspId</span> @row.Level.Title</td>
+                    <td><span class="btb-status @StatusCss(row.Status)">@StatusLabel(row.Status)</span></td>
+                    <td class="text-end">@row.Points</td>
+                    <td class="text-end"><a class="btn btn-primary btn-sm" href="/Levels/Play?id=@row.Level.Id">Open</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="text-secondary small">More levels appear here as they are built.</p>
+</div>

@@ -1,0 +1,74 @@
+@page
+@using BreakTheBot.Web.Levels
+@using Microsoft.AspNetCore.Antiforgery
+@model PlayModel
+@inject IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = $"Level {Model.Level.Id}: {Model.Level.Codename}";
+    var token = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<div class="pt-4 pb-2">
+    <a href="/Dashboard" class="text-secondary small">&larr; Dashboard</a>
+    <h2 class="mt-2 mb-1" style="font-family: var(--btb-mono);">
+        Level @Model.Level.Id &middot; @Model.Level.Codename
+    </h2>
+    <span class="btb-badge btb-badge-playable">@Model.Level.OwaspId @Model.Level.Title</span>
+    @if (Model.Level.Kind == LevelKind.Lighter) { <span class="btb-badge btb-badge-soon">lighter level</span> }
+</div>
+
+<div class="row g-3 mb-5">
+    <div class="col-lg-4">
+        <div class="btb-panel mb-3">
+            <h6>Scenario</h6>
+            <p class="mb-3">@Model.Level.Scenario</p>
+            <h6>Objective</h6>
+            <p class="mb-0">@Model.Level.Objective</p>
+        </div>
+        <div class="btb-panel mb-3">
+            <h6>Hints</h6>
+            <button class="btn btn-outline-light btn-sm" disabled>Show hint (arrives Day 5)</button>
+        </div>
+        <div class="btb-panel">
+            <h6>Submit flag</h6>
+            <div class="input-group">
+                <input class="form-control" placeholder="FLAG{...}" disabled style="font-family: var(--btb-mono);" />
+                <button class="btn btn-outline-light" disabled>Go</button>
+            </div>
+            <div class="small text-secondary mt-2">Flag submission arrives on Day 5.</div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="btb-panel" id="chat-app"
+             data-level-id="@Model.Level.Id"
+             data-token="@token"
+             data-max-chars="@Model.MaxChars">
+            <h6>Chat</h6>
+            <div id="chat-log" class="btb-chat-log" aria-live="polite">
+                @foreach (var h in Model.History)
+                {
+                    <div class="btb-msg btb-msg-user">@h.UserMessage</div>
+                    <div class="btb-msg btb-msg-bot">@h.BotResponse</div>
+                }
+                @if (!Model.History.Any())
+                {
+                    <div class="btb-msg btb-msg-note" id="chat-empty">Say hello to start the conversation.</div>
+                }
+            </div>
+            <div class="d-flex gap-2 mt-2">
+                <textarea id="chat-input" class="form-control" rows="2" maxlength="@Model.MaxChars"
+                          placeholder="Type your message... (Enter to send, Shift+Enter for a new line)"
+                          style="font-family: var(--btb-mono);"></textarea>
+                <button id="chat-send" class="btn btn-primary">Send</button>
+            </div>
+            <div class="small text-secondary mt-2">
+                Messages left today: <span id="chat-quota">@Model.RemainingToday</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

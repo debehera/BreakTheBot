@@ -9,8 +9,13 @@ public record OwaspItem(string Code, string Title, string Blurb, int? LevelNumbe
 
 public class IndexModel : PageModel
 {
-    // Flipped to true on Day 4, when the level Play page exists.
-    public bool LevelsEnabled { get; } = false;
+        private readonly BreakTheBot.Web.Levels.LevelRegistry _levels;
+
+    public IndexModel(BreakTheBot.Web.Levels.LevelRegistry levels) => _levels = levels;
+
+    // A level's "Open" button appears only once that level has been built.
+    public bool IsOpen(int levelNumber) => _levels.GetById(levelNumber) != null;
+    
 
     public IReadOnlyList<OwaspItem> Items { get; } = new List<OwaspItem>
     {
