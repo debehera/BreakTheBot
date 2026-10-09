@@ -57,7 +57,23 @@ public abstract class LevelBase : ILevel
         var reversed = new string(needle.Reverse().ToArray());
         return haystack.Contains(needle) || haystack.Contains(reversed);
     }
+    /// <summary>
+    /// ContainsFlag plus the common direct encodings of the flag (base64 and hex).
+    /// Not exhaustive on purpose: real filters always miss some encodings.
+    /// </summary>
+    public static bool LeaksFlag(string? text, string flag)
+    {
+        if (ContainsFlag(text, flag)) return true;
+        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(flag)) return false;
 
+        var compact = new string(text.Where(c => !char.IsWhiteSpace(c)).ToArray());
+        var bytes = System.Text.Encoding.UTF8.GetBytes(flag);
+        var b64 = Convert.ToBase64String(bytes);
+
+        return compact.Contains(b64, StringComparison.Ordinal)
+            || compact.Contains(b64.TrimEnd('='), StringComparison.Ordinal)
+            || compact.Contains(Convert.ToHexString(bytes), StringComparison.OrdinalIgnoreCase);
+    }
     private static string Normalize(string s) =>
         new(s.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
 }

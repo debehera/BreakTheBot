@@ -57,6 +57,7 @@ builder.Services.AddHttpClient<ILlmClient, GeminiClient>(client =>
 
 // Levels (add one line per level).
 builder.Services.AddSingleton<ILevel, Level1SupportBot>();
+builder.Services.AddSingleton<ILevel, Level2Aria>();
 builder.Services.AddSingleton<LevelRegistry>();
 
 // Per-user rate limit for chat: Limits:PerMinutePerUser requests per minute.
@@ -73,6 +74,19 @@ builder.Services.AddRateLimiter(options =>
         {
             PermitLimit = perMinute,
             Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        });
+    });
+        // Flag guesses: 20 per hour per user, so flags cannot be brute-forced.
+    options.AddPolicy("flag", http =>
+    {
+        var key = http.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                  ?? http.Connection.RemoteIpAddress?.ToString()
+                  ?? "anonymous";
+        return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20,
+            Window = TimeSpan.FromHours(1),
             QueueLimit = 0
         });
     });

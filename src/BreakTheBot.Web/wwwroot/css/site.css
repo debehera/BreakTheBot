@@ -197,3 +197,58 @@ body {
 .btb-status-defended { color: var(--btb-success); border-color: var(--btb-success); }
 .progress { background-color: var(--btb-border); }
 .progress-bar { background-color: var(--btb-accent); }
+
+/* Result cards, explanation, switch */
+.btb-result {
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--btb-border);
+  font-size: 0.9rem;
+}
+.btb-result-ok { color: var(--btb-success); border-color: var(--btb-success); background: rgba(63, 185, 80, 0.08); }
+.btb-result-warn { color: var(--btb-warning); border-color: var(--btb-warning); background: rgba(210, 153, 34, 0.08); }
+.btb-result-bad { color: var(--btb-danger); border-color: var(--btb-danger); background: rgba(248, 81, 73, 0.08); }
+.btb-result code, .btb-result .btb-quote {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--btb-mono);
+  color: var(--btb-text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.btb-explanation ul { padding-left: 1.2rem; }
+.btb-explanation li { margin-bottom: 0.3rem; }
+.form-check-input:checked { background-color: var(--btb-accent); border-color: var(--btb-accent); }
+/* Dark form inputs */
+.form-control,
+.form-control:disabled {
+  background-color: var(--btb-bg);
+  color: var(--btb-text);
+  border-color: var(--btb-border);
+}
+.form-control:focus {
+  background-color: var(--btb-bg);
+  color: var(--btb-text);
+  border-color: var(--btb-accent);
+  box-shadow: 0 0 0 0.2rem rgba(45, 212, 191, 0.2);
+}
+.form-control::placeholder { color: var(--btb-muted); }
+
+/* Readable dashboard table */
+.table {
+  --bs-table-color: var(--btb-text);
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--btb-border);
+  color: var(--btb-text);
+}
+.table > :not(caption) > * > * {
+  color: var(--btb-text);
+  background-color: transparent;
+}
+.table thead th {
+  color: var(--btb-muted);
+  font-family: var(--btb-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
