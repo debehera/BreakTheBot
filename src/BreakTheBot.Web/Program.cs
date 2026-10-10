@@ -58,6 +58,8 @@ builder.Services.AddHttpClient<ILlmClient, GeminiClient>(client =>
 // Levels (add one line per level).
 builder.Services.AddSingleton<ILevel, Level1SupportBot>();
 builder.Services.AddSingleton<ILevel, Level2Aria>();
+builder.Services.AddSingleton<ILevel, Level3HrHelper>();
+builder.Services.AddSingleton<ILevel, Level4OpsAssistant>();
 builder.Services.AddSingleton<LevelRegistry>();
 
 // Per-user rate limit for chat: Limits:PerMinutePerUser requests per minute.

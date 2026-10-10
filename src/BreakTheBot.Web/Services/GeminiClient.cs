@@ -81,7 +81,7 @@ public class GeminiClient : ILlmClient
         }
     }
 
-    private static LlmResult Parse(string raw)
+    private LlmResult Parse(string raw)
     {
         using var doc = JsonDocument.Parse(raw);
         var root = doc.RootElement;
@@ -105,8 +105,21 @@ public class GeminiClient : ILlmClient
         if (candidate.TryGetProperty("content", out var content) && content.TryGetProperty("parts", out var parts))
         {
             foreach (var part in parts.EnumerateArray())
+            {
                 if (part.TryGetProperty("text", out var t))
+                {
                     text.Append(t.GetString());
+                }
+                else if (part.TryGetProperty("functionCall", out var fc))
+                {
+                    // The model used its native function-calling format. Convert it into the
+                    // plain JSON tool request that the rest of the app understands.
+                    var name = fc.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+                    var args = fc.TryGetProperty("args", out var a) ? a.GetRawText() : "{}";
+                    text.Append("{\"tool\":").Append(JsonSerializer.Serialize(name))
+                        .Append(",\"args\":").Append(args).Append('}');
+                }
+            }
         }
 
         var finish = candidate.TryGetProperty("finishReason", out var fr) ? fr.GetString() : null;
@@ -115,6 +128,7 @@ public class GeminiClient : ILlmClient
         {
             if (finish is "SAFETY" or "PROHIBITED_CONTENT" or "BLOCKLIST" or "SPII")
                 return new LlmResult(false, "", input, output, "The AI declined to answer that. Try rewording it.", SafetyBlocked: true);
+            _log.LogWarning("Gemini returned no text. finishReason={Finish}, outputTokens={Output}", finish, output);
             return Fail("The AI returned an empty answer. Please try again.");
         }
 
