@@ -60,6 +60,9 @@ builder.Services.AddSingleton<ILevel, Level1SupportBot>();
 builder.Services.AddSingleton<ILevel, Level2Aria>();
 builder.Services.AddSingleton<ILevel, Level3HrHelper>();
 builder.Services.AddSingleton<ILevel, Level4OpsAssistant>();
+builder.Services.AddSingleton<ILevel, Level5SummarizeApi>();
+builder.Services.AddSingleton<ILevel, Level6ReviewWidget>();
+builder.Services.AddSingleton<ILevel, Level7SecAdvisor>();
 builder.Services.AddSingleton<LevelRegistry>();
 
 // Per-user rate limit for chat: Limits:PerMinutePerUser requests per minute.

@@ -10,7 +10,73 @@
   const quotaEl = document.getElementById('chat-quota');
   const defenseSwitch = document.getElementById('defense-switch'); // only exists after capture
   let busy = false;
+  const tokenGoal = parseInt(app.dataset.tokenGoal || '0', 10);
+  const rendersHtml = app.dataset.rendersHtml === 'true';
 
+  // Level 6 only: builds the page that is shown inside the sandboxed iframe.
+  // The CSP blocks every network request. The small shim turns alert/confirm/prompt into visible
+  // notes, because a sandbox without "allow-modals" would hide them.
+  function buildSandboxDoc(html) {
+    const csp = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:";
+    const shim =
+      "<script>(function(){" +
+      "function note(t){var d=document.createElement('div');" +
+      "d.style.cssText='margin:6px 0;padding:6px 8px;border:1px solid #f85149;color:#f85149;font:12px monospace;background:rgba(248,81,73,.1)';" +
+      "d.textContent=t;(document.body||document.documentElement).appendChild(d);}" +
+      "window.alert=function(m){note('Script ran: alert('+m+')');};" +
+      "window.confirm=window.prompt=function(m){note('Script ran: '+m);return null;};" +
+      "})();<\/script>";
+    const style = '<style>body{margin:8px;color:#e6edf3;background:#161b22;font:14px system-ui,sans-serif}</style>';
+    return '<!doctype html><html><head><meta charset="utf-8">' +
+      '<meta http-equiv="Content-Security-Policy" content="' + csp + '">' +
+      style + shim + '</head><body>' + html + '</body></html>';
+  }
+
+  function addRenderedBubble(html) {
+    const empty = document.getElementById('chat-empty');
+    if (empty) empty.remove();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'btb-msg btb-msg-bot btb-render-wrap';
+
+    const label1 = document.createElement('div');
+    label1.className = 'btb-render-label';
+    label1.textContent = 'Rendered by the app (inside a sandbox):';
+
+    // sandbox="allow-scripts" WITHOUT allow-same-origin: scripts can run, but they cannot reach
+    // cookies, storage, or the parent page.
+    const frame = document.createElement('iframe');
+    frame.setAttribute('sandbox', 'allow-scripts');
+    frame.className = 'btb-render-frame';
+    frame.title = 'Sandboxed AI output';
+    frame.srcdoc = buildSandboxDoc(html);   // set as a property, never string-concatenated into the page
+
+    const label2 = document.createElement('div');
+    label2.className = 'btb-render-label';
+    label2.textContent = 'Raw output from the AI:';
+
+    const raw = document.createElement('pre');
+    raw.className = 'btb-render-raw';
+    raw.textContent = html;                 // text only
+
+    wrap.append(label1, frame, label2, raw);
+    log.appendChild(wrap);
+    scrollToBottom();
+  }
+  // Level 5 only: shows how many tokens the last reply used.
+  function updateMeter(usage) {
+    if (!tokenGoal || !usage) return;
+    const out = usage.outputTokens || 0;
+    const outEl = document.getElementById('token-out');
+    const inEl = document.getElementById('token-in');
+    const bar = document.getElementById('token-bar');
+    if (outEl) outEl.textContent = out;
+    if (inEl) inEl.textContent = usage.inputTokens || 0;
+    if (bar) {
+      bar.style.width = Math.min(100, Math.round(100 * out / tokenGoal)) + '%';
+      bar.style.backgroundColor = out >= tokenGoal ? 'var(--btb-success)' : '';
+    }
+  }
   // ---------- helpers ----------
 
   function scrollToBottom() { log.scrollTop = log.scrollHeight; }
@@ -89,7 +155,7 @@
       if (!res.ok) { addBubble('error', errorText(res)); return; }
 
       const data = res.data;
-      addBubble('bot', data.reply);
+      if (rendersHtml) addRenderedBubble(data.reply); else addBubble('bot', data.reply);
       if (data.systemNote) addBubble('note', data.systemNote);
       if (data.exploitDetected) {
         addBubble('note', defenseOn
@@ -97,6 +163,7 @@
           : 'Exploit detected! Find the flag in the output and submit it on the left.');
       }
       if (data.quota && quotaEl) quotaEl.textContent = data.quota.userRemainingToday;
+      updateMeter(data.usage);
     } catch (err) {
       typing.remove();
       addBubble('error', 'Could not reach the server. Check your connection and try again.');

@@ -252,3 +252,25 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+/* Level 6: sandboxed HTML preview */
+.btb-render-wrap { max-width: 100%; width: 100%; }
+.btb-render-label { color: var(--btb-muted); font-size: 0.75rem; margin: 0.25rem 0; }
+.btb-render-frame {
+  width: 100%;
+  height: 170px;
+  border: 1px solid var(--btb-border);
+  border-radius: 6px;
+  background: var(--btb-panel);
+}
+.btb-render-raw {
+  margin: 0;
+  padding: 0.5rem;
+  background: var(--btb-bg);
+  border: 1px solid var(--btb-border);
+  border-radius: 6px;
+  color: var(--btb-text);
+  font-family: var(--btb-mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

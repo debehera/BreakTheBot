@@ -15,7 +15,8 @@ public abstract class LevelBase : ILevel
     public abstract string ExplanationHtml { get; }
     public virtual bool HasDefense => true;
     public virtual string DefenseSummary => "";
-
+    public virtual int? TokenGoal => null;
+    public virtual bool RendersHtml => false;
     public abstract Task<LevelReply> HandleAsync(LevelContext ctx, string userMessage, CancellationToken ct);
 
     /// <summary>

@@ -31,7 +31,9 @@
      data-token="@token"
      data-max-chars="@Model.MaxChars"
      data-captured="@(captured ? "true" : "false")"
-     data-hints-left="@hintsLeft">
+     data-hints-left="@hintsLeft"
+     data-token-goal="@(Model.Level.TokenGoal?.ToString() ?? "")"
+     data-renders-html="@(Model.Level.RendersHtml ? "true" : "false")">
 
     <div class="col-lg-4">
         <div class="btb-panel mb-3">
@@ -105,6 +107,20 @@
                           style="font-family: var(--btb-mono);"></textarea>
                 <button id="chat-send" class="btn btn-primary">Send</button>
             </div>
+                        @if (Model.Level.TokenGoal.HasValue)
+            {
+                <div class="mt-3" id="token-meter-wrap">
+                    <div class="d-flex justify-content-between small">
+                        <span>Output tokens in the last reply</span>
+                        <span><strong id="token-out">0</strong> / @Model.Level.TokenGoal goal</span>
+                    </div>
+                    <div class="progress mt-1" role="progressbar" aria-label="Output tokens"
+                         aria-valuemin="0" aria-valuemax="@Model.Level.TokenGoal">
+                        <div id="token-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="small text-secondary mt-1">Input tokens: <span id="token-in">0</span></div>
+                </div>
+            }
             <div class="small text-secondary mt-2">
                 Messages left today: <span id="chat-quota">@Model.RemainingToday</span>
             </div>

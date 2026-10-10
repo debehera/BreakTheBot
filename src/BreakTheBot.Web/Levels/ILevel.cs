@@ -36,6 +36,7 @@ public interface ILevel
     string ExplanationHtml { get; }
     bool HasDefense { get; }
     string DefenseSummary { get; }
-
+    int? TokenGoal { get; }   // null = no token meter on the level page
+    bool RendersHtml { get; } // true = the page shows the reply as sandboxed HTML (Level 6)
     Task<LevelReply> HandleAsync(LevelContext ctx, string userMessage, CancellationToken ct);
 }
