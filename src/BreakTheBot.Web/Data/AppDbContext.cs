@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BreakTheBot.Web.Data;
 
-public class AppDbContext : IdentityDbContext<IdentityUser>
+public class AppDbContext : IdentityDbContext<IdentityUser>, IDataProtectionKeyContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -12,6 +13,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<LevelProgress> LevelProgress => Set<LevelProgress>();
     public DbSet<ChatLog> ChatLogs => Set<ChatLog>();
+
+    // Login and anti-forgery keys. Only used in production (see Program.cs).
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

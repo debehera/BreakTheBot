@@ -4,20 +4,24 @@ using BreakTheBot.Web.Data;
 using BreakTheBot.Web.Endpoints;
 using BreakTheBot.Web.Levels;
 using BreakTheBot.Web.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Database: SQLite locally, PostgreSQL in production (chosen by config).
 var provider = builder.Configuration["Database:Provider"] ?? "Sqlite";
+var isPostgres = provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase);
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+    if (isPostgres)
         options.UseNpgsql(connectionString);
     else
         options.UseSqlite(connectionString);
@@ -34,6 +38,25 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.Password.RequireNonAlphanumeric = false;
 })
 .AddEntityFrameworkStores<AppDbContext>();
+
+// On the host the disk is wiped on every restart, so keep the login and anti-forgery keys in the
+// database. Otherwise every restart would log everyone out. (Local SQLite keeps using the disk.)
+if (isPostgres)
+{
+    builder.Services.AddDataProtection()
+        .SetApplicationName("BreakTheBot")
+        .PersistKeysToDbContext<AppDbContext>();
+}
+
+// Behind the host's proxy the app sees plain HTTP from the proxy. These headers carry the real
+// scheme and visitor address, so cookies, redirects and per-IP limits work.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // The proxy's address is not fixed, and the container is only reachable through it.
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Login cookie: not readable by scripts, not sent on cross-site requests, Secure outside development.
 var cookieSecurity = builder.Environment.IsDevelopment()
@@ -87,11 +110,12 @@ builder.Services.AddSingleton<LevelRegistry>();
 
 // Rate limits.
 var perMinute = builder.Configuration.GetValue("Limits:PerMinutePerUser", 10);
+var authAttempts = builder.Configuration.GetValue("Limits:AuthAttemptsPer10Min", 10);
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    // Sign-in and sign-up attempts: 10 per 10 minutes per IP address. Slows password guessing.
+    // Sign-in and sign-up attempts per IP address, per 10 minutes. Slows password guessing.
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(http =>
     {
         var isAuthPost = HttpMethods.IsPost(http.Request.Method)
@@ -103,7 +127,7 @@ builder.Services.AddRateLimiter(options =>
         var ip = http.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         return RateLimitPartition.GetFixedWindowLimiter("auth:" + ip, _ => new FixedWindowRateLimiterOptions
         {
-            PermitLimit = 10,
+            PermitLimit = authAttempts,
             Window = TimeSpan.FromMinutes(10),
             QueueLimit = 0
         });
@@ -166,6 +190,9 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+// Must run first: it restores the real scheme and visitor address from the proxy's headers.
+app.UseForwardedHeaders();
 
 // Create the tables on startup (no migrations in v1.0).
 using (var scope = app.Services.CreateScope())
@@ -231,6 +258,9 @@ app.UseRateLimiter();   // after authentication, so limits are per user
 
 app.MapRazorPages();
 app.MapLevelEndpoints();
+
+// For the host and for you: a plain "ok" that touches neither the database nor the AI.
+app.MapGet("/healthz", () => Results.Text("ok")).AllowAnonymous();
 
 app.Run();
 

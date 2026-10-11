@@ -22,7 +22,7 @@ namespace BreakTheBot.Tests;
 /// </summary>
 internal sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    public const string Scheme = "Test";
+        public new const string Scheme = "Test";
     public const string UserHeader = "X-Test-User";
 
     public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
