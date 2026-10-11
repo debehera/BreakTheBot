@@ -1,0 +1,74 @@
+@page
+@{
+    ViewData["Title"] = "About";
+}
+
+<div class="pt-4 pb-5" style="max-width: 820px;">
+    <h2 class="mb-3" style="font-family: var(--btb-mono);">About BreakTheBot</h2>
+
+    <div class="btb-panel mb-3">
+        <h6>What this is</h6>
+        <p class="mb-0">
+            BreakTheBot is a free, hands-on lab for the
+            <a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener noreferrer">OWASP Top 10 for LLM Applications</a>.
+            Each level is a deliberately vulnerable AI app. You attack it, capture a flag, learn why it worked,
+            then switch on a defense and replay your attack to see whether the fix holds.
+        </p>
+    </div>
+
+    <div class="btb-panel mb-3">
+        <h6>How scoring works</h6>
+        <ul class="mb-0">
+            <li><strong>Attack:</strong> 100 points per level, minus 10 for each hint you use (never below 50).</li>
+            <li><strong>Defense:</strong> 50 points per level when your replayed attack is blocked (levels 1 to 5).</li>
+            <li><strong>Maximum:</strong> 950 points. Ties on the leaderboard go to whoever scored first.</li>
+            <li>Each flag is unique to your account, so flags cannot be shared or copied.</li>
+        </ul>
+    </div>
+
+    <div class="btb-panel mb-3">
+        <h6>Levels</h6>
+        <p class="mb-2">Seven playable levels today, with three more planned.</p>
+        <ul class="mb-0">
+            <li>Playable: LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM05 Improper Output Handling,
+                LLM06 Excessive Agency, LLM07 System Prompt Leakage, LLM09 Misinformation, LLM10 Unbounded Consumption.</li>
+            <li>Coming soon: LLM03 Supply Chain, LLM04 Data and Model Poisoning, LLM08 Vector and Embedding Weaknesses.</li>
+        </ul>
+    </div>
+
+    <div class="btb-panel mb-3">
+        <h6>Ethical use</h6>
+        <p class="mb-0">
+            Everything here is simulated and built for education. The techniques you practice should only ever be used
+            on systems you own or have explicit written permission to test. Do not point them at real services.
+        </p>
+    </div>
+
+    <div class="btb-panel mb-3">
+        <h6>Privacy and your data</h6>
+        <ul class="mb-0">
+            <li><strong>Please do not type personal or sensitive information into the chats.</strong></li>
+            <li>The AI targets run on a free Google Gemini service. Prompts sent on a free tier may be reviewed or used by
+                Google to improve its products, so treat every message as non-private.</li>
+            <li>We store your email address, your progress and your chat messages. The leaderboard shows only the part of
+                your email before the @@ sign.</li>
+            <li>There is no password reset in this version, so keep your password safe.</li>
+        </ul>
+    </div>
+
+    <div class="btb-panel mb-3">
+        <h6>Fair use</h6>
+        <p class="mb-0">
+            The AI allowance is shared by everyone and is limited. Each player gets a daily message allowance, and the
+            lab as a whole has a daily cap. If you see a "limit reached" message, please try again later.
+        </p>
+    </div>
+
+    <div class="btb-panel">
+        <h6>Built with</h6>
+        <p class="mb-0">
+            .NET 8 and ASP.NET Core, Entity Framework Core, and Google Gemini. Source code:
+            <a href="https://github.com/debehera/BreakTheBot" target="_blank" rel="noopener noreferrer">github.com/debehera/BreakTheBot</a>.
+        </p>
+    </div>
+</div>

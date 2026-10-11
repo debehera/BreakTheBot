@@ -1,0 +1,65 @@
+@page
+@model LeaderboardModel
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+<div class="pt-4 pb-3">
+    <h2 class="mb-1" style="font-family: var(--btb-mono);">Leaderboard</h2>
+    <p class="text-secondary">
+        Top @LeaderboardModel.TopCount players by points (maximum 950). Ties go to whoever scored first.
+        Names are the part of each email before the @@ sign.
+    </p>
+
+    @if (!Model.Top.Any())
+    {
+        <div class="btb-panel text-center py-5">
+            <p class="mb-2">No scores yet. Be the first!</p>
+            <a class="btn btn-primary btn-sm" href="/Dashboard">Start playing</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th class="text-end">Points</th>
+                        <th class="text-end">Captured</th>
+                        <th class="text-end">Defended</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model.Top)
+                {
+                    <tr class="@(row.IsCurrentUser ? "btb-row-me" : "")">
+                        <td>
+                            @if (row.Rank == 1) { <span title="First place">🥇</span> }
+                            else if (row.Rank == 2) { <span title="Second place">🥈</span> }
+                            else if (row.Rank == 3) { <span title="Third place">🥉</span> }
+                            else { @row.Rank }
+                        </td>
+                        <td>
+                            @row.DisplayName
+                            @if (row.IsCurrentUser) { <span class="btb-badge btb-badge-playable ms-1">you</span> }
+                        </td>
+                        <td class="text-end"><strong>@row.Points</strong></td>
+                        <td class="text-end">@row.Captured / 7</td>
+                        <td class="text-end">@row.Defended / 5</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.Me != null && Model.Me.Rank > LeaderboardModel.TopCount)
+        {
+            <div class="btb-panel">
+                Your rank: <strong>#@Model.Me.Rank</strong> of @Model.TotalPlayers players,
+                with <strong>@Model.Me.Points</strong> points.
+            </div>
+        }
+    }
+</div>

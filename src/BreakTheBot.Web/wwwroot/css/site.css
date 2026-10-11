@@ -274,3 +274,52 @@ body {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+/* Leaderboard: highlight the current user */
+.btb-row-me > td {
+  background-color: rgba(45, 212, 191, 0.10) !important;
+  border-color: var(--btb-accent);
+}
+/* Home page: "How it works" steps */
+.btb-step {
+  background: var(--btb-panel);
+  border: 1px solid var(--btb-border);
+  border-radius: 8px;
+  padding: 1rem;
+  height: 100%;
+}
+.btb-step p {
+  color: var(--btb-muted);
+  font-size: 0.85rem;
+  margin: 0.4rem 0 0;
+}
+.btb-step-num {
+  width: 1.8rem;
+  height: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--btb-accent);
+  color: var(--btb-accent);
+  font-family: var(--btb-mono);
+  font-size: 0.85rem;
+}
+.btb-step strong {
+  font-family: var(--btb-mono);
+}
+.btn-outline-light {
+  --bs-btn-color: var(--btb-text);
+  --bs-btn-hover-bg: var(--btb-panel);
+  --bs-btn-hover-color: var(--btb-accent);
+  --bs-btn-hover-border-color: var(--btb-accent);
+}
+/* Error page */
+.btb-error-code {
+  font-family: var(--btb-mono);
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--btb-accent);
+  margin-bottom: 0.5rem;
+}

@@ -43,8 +43,8 @@
     label1.className = 'btb-render-label';
     label1.textContent = 'Rendered by the app (inside a sandbox):';
 
-    // sandbox="allow-scripts" WITHOUT allow-same-origin: scripts can run, but they cannot reach
-    // cookies, storage, or the parent page.
+    // sandbox="allow-scripts" only (the same-origin permission is deliberately left out): scripts
+    // can run, but they cannot reach cookies, storage, or the parent page.
     const frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-scripts');
     frame.className = 'btb-render-frame';
@@ -81,7 +81,7 @@
 
   function scrollToBottom() { log.scrollTop = log.scrollHeight; }
 
-  // Every dynamic piece of text is set with textContent, never innerHTML.
+  //   // Every dynamic piece of text is set with textContent only.
   function addBubble(kind, text) {
     const empty = document.getElementById('chat-empty');
     if (empty) empty.remove();

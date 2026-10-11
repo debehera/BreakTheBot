@@ -2,6 +2,7 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home";
+    var signedIn = User.Identity?.IsAuthenticated == true;
 }
 
 <section class="btb-hero text-center">
@@ -10,8 +11,55 @@
         A hands-on lab for the OWASP Top 10 for LLM Applications. Attack deliberately vulnerable
         AI apps, capture the flag, learn why it worked, then switch on a defense and try again.
     </p>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+        @if (signedIn)
+        {
+            <a class="btn btn-primary" href="/Dashboard">Continue playing</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" href="/Identity/Account/Register">Get started, it's free</a>
+            <a class="btn btn-outline-light" href="/Identity/Account/Login">Log in</a>
+        }
+        <a class="btn btn-outline-light" href="/Leaderboard">View leaderboard</a>
+    </div>
 </section>
 
+<section class="mb-5">
+    <h5 class="text-center mb-3" style="font-family: var(--btb-mono);">How it works</h5>
+    <div class="row row-cols-2 row-cols-lg-4 g-3">
+        <div class="col">
+            <div class="btb-step">
+                <div class="btb-step-num">1</div>
+                <strong>Attack</strong>
+                <p>Chat with a vulnerable AI app and try to make it misbehave.</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="btb-step">
+                <div class="btb-step-num">2</div>
+                <strong>Learn</strong>
+                <p>Capture the flag, then read why the attack worked and how OWASP says to prevent it.</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="btb-step">
+                <div class="btb-step-num">3</div>
+                <strong>Defend</strong>
+                <p>Switch on the defense for that level, the way a real team would harden it.</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="btb-step">
+                <div class="btb-step-num">4</div>
+                <strong>Verify</strong>
+                <p>Replay your attack against the defense and see whether it holds.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<h5 class="text-center mb-3" style="font-family: var(--btb-mono);">The OWASP LLM Top 10</h5>
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-5">
     @foreach (var item in Model.Items)
     {
