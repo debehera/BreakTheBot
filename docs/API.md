@@ -38,18 +38,18 @@
 
 ## 2. Page routes (Razor Pages)
 
-| Route | Auth | Purpose | Built on |
+| Route | Auth | Purpose | Status |
 |---|---|---|---|
-| `GET /` | Public | Landing page with 10 OWASP cards (7 playable, 3 Coming Soon) | Day 2 ✅ |
-| `GET /Identity/Account/Register` | Public | Create account | Day 3 |
-| `GET /Identity/Account/Login` | Public | Log in | Day 3 |
-| `POST /Identity/Account/Logout` | Auth | Log out | Day 3 |
-| `GET /Dashboard` | Auth | Level list with status badges, points, total score | Day 4 |
+| `GET /` | Public | Landing page with 10 OWASP cards (7 playable, 3 Coming Soon) | Built |
+| `GET /Identity/Account/Register` | Public | Create account | Built |
+| `GET /Identity/Account/Login` | Public | Log in | Built |
+| `POST /Identity/Account/Logout` | Auth | Log out | Built |
+| `GET /Dashboard` | Auth | Level list with status badges, points, total score | Built |
 | `GET /Levels/Play?id={n}` | Auth | Level page: scenario, chat, flag form, hints, explanation, defense | Day 4–5 |
-| `GET /Leaderboard` | Public (read-only) | Top 10 by points | Day 8 |
-| `GET /About` | Public | Purpose, OWASP link, ethical use, privacy note | Day 8 |
-| `GET /Error` | Public | Generic error page | Day 8 |
-| `GET /healthz` | Public | Returns 200 `ok` for host health checks | Day 9 |
+| `GET /Leaderboard` | Public (read-only) | Top 10 by points | Built |
+| `GET /About` | Public | Purpose, OWASP link, ethical use, privacy note | Built |
+| `GET /Error` | Public | Generic error page | Built |
+| `GET /healthz` | Public | Returns 200 `ok` for host health checks | Built |
 
 ## 3. JSON endpoints
 
@@ -170,6 +170,8 @@ Chat rows are marked `IsReset` rather than deleted so daily quota counting stays
 | Max output tokens (hard cap) | 1024 | `GeminiClient` | `Limits:MaxOutputTokens` |
 | Flag attempts | 20/hour/user | Endpoint | fixed in code |
 
+Sign-in and sign-up attempts are limited per IP address (`Limits:AuthAttemptsPer10Min`, default 10 per 10 minutes, set to 30 in production because the host proxy can hide real addresses). The login pages answer a throttled attempt with a plain-text 429.
+
 Upstream (Gemini, observed Day 2 for `gemini-3.5-flash-lite`): 15 requests/min and 500 requests/day, shared by everyone. The app's own limits keep us below that.
 
 ## 5. Per-level behavior summary
@@ -224,3 +226,20 @@ Rules: never log the API key; first `contents` entry must be role `user`; roles 
 - No public API in v1.0, so no version prefix. The JSON endpoints are internal to the site.
 - Additive changes (new response fields) are safe; renaming or removing fields requires updating `chat.js` in the same commit.
 - Update this file whenever an endpoint, field or error code changes.
+
+---
+
+## 8. As built (updated on Day 10)
+
+Everything in this document is implemented. Differences and additions compared with the Day 2 design:
+
+- **Replay response** also contains `systemNote` (for example the tool-denial message in Level 4). Errors from replay use the same codes as chat (`not_captured`, `no_winning_prompt`, `no_defense_for_level`, `daily_cap_user`, `llm_quota`, and so on).
+- **Flag guesses** are limited by a named rate-limit policy (`flag`, 20 per hour per user). Hitting it returns the standard 429 `rate_limited` JSON.
+- **Chat quota field:** `quota` contains only `userRemainingToday`.
+- **Level 4 (tools):** the model's JSON tool request is shown as the bot reply, and the tool outcome is returned in `systemNote` (prefixed with a wrench icon). The flag appears in `systemNote` only when a refund above $50 actually ran.
+- **Level 5 (tokens):** `usage.outputTokens` of a single reply drives the token meter. The win threshold is 600 output tokens; the hard cap is 1024 (150 with the defense on).
+- **Level 6 (HTML):** `reply` is raw HTML text. The browser shows it inside `<iframe sandbox="allow-scripts">` (never `allow-same-origin`) with a locked-down policy, plus the raw text beside it. Earlier replies reloaded from the database are shown as plain text.
+- **Level properties** used by the Play page: `TokenGoal` (shows the token meter) and `RendersHtml` (sandboxed HTML rendering and the relaxed script policy on that one page).
+- **`GET /healthz`** returns plain `ok` and touches neither the database nor the AI. It is not configured as a host health check, so it never keeps the free instance awake.
+- **Security headers** on every response: `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Permissions-Policy`, and a strict Content Security Policy. Only the Play page of a level with `RendersHtml == true` allows inline script, and that content stays inside the sandboxed frame.
+- **Error pages:** non-API requests that end in 4xx or 5xx are re-executed through `/Error?code=...`; JSON API errors keep their JSON body.

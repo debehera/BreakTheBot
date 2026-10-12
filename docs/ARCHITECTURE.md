@@ -326,3 +326,42 @@ Free quota is 500 Gemini requests/day. Reserve ~100 for development and testing,
 - Log: Gemini failures (status only, never the key), rate-limit hits, flag submissions (success/fail, no flag text), startup configuration problems.
 - Never log: API keys, flags, passwords, full prompts in production.
 - The host's log viewer (Render dashboard) is the monitoring tool for v1.0.
+
+---
+
+## 15. As built (updated on Day 10)
+
+The design above was implemented. These are the details that were decided or discovered while building and deploying.
+
+### Deployment as built
+
+- **Host:** Render free Docker web service (Singapore). The image is built from the repository's `Dockerfile` (SDK image to build, ASP.NET runtime image to run; the start command reads the `PORT` variable). The free service sleeps after 15 minutes without traffic; a cold start takes about a minute (measured).
+- **Database:** Neon free Postgres (Singapore), direct connection with pooling off. The schema is created with `EnsureCreated()` on first start.
+- **Configuration** is supplied as environment variables: `Database__Provider`, `ConnectionStrings__Default`, `Gemini__ApiKey`, `Gemini__Model`, `Flags__Secret` (a different secret from local development, so local flags never work online), and `Limits__AuthAttemptsPer10Min`. No secret is stored in the repository, and the full Git history was scanned.
+
+### Production behavior
+
+- **Login and anti-forgery keys** are stored in the database (`DataProtectionKeys` table) when the provider is Postgres, because the host's disk is wiped on every restart. Verified: users stay logged in across a restart. Local SQLite development keeps the keys on disk.
+- **Forwarded headers** run first in the pipeline so the app sees the real scheme and visitor address behind the host's proxy.
+- **Request pipeline, in order:** forwarded headers, startup `EnsureCreated`, exception handler and HSTS (non-development), status-code pages, security headers and CSP, HTTPS redirection, static files, routing, authentication, authorization, rate limiter, then Razor Pages, the level endpoints and `/healthz`.
+- **Rate limits:** a global limiter for POST sign-in and sign-up attempts per IP address; named policies `chat` (per user per minute) and `flag` (20 per hour per user); daily caps counted from `ChatLog`.
+- **Security headers and CSP:** strict everywhere; the single exception is the Play page of a level whose `RendersHtml` is true (Level 6), where inline script is allowed so the sandboxed demo can run. That content is shown in an iframe with `sandbox="allow-scripts"` and no same-origin permission.
+
+### Application details worth knowing
+
+- **Level contract:** `TokenGoal` (Level 5 shows a token meter) and `RendersHtml` (Level 6) were added to `ILevel`; `LevelReply` gained `Error` and `ErrorCode`.
+- **LevelEngine** exposes `ChatAsync`, `SubmitFlagAsync`, `HintAsync`, `ResetAsync` and `ReplayAsync`. A message stopped by an input guard never reaches the AI and costs no quota; a denied tool call (Level 4) did use the AI and does count.
+- **Level 4** uses the same prompt with the defense on and off. The defense is server-side policy in `ToolExecutor`: role allowlist, argument validation, approval gate.
+- **Gemini client:** the model sometimes answers with a native function call instead of text; the client converts it to the plain JSON the app expects. Safety blocks, 429s, timeouts and malformed JSON become friendly errors.
+- **Leaderboard** is computed in C# (not in SQL) so SQLite and Postgres behave identically.
+
+### Testing
+
+About 327 automated tests: unit tests per service and level, learning-loop tests, and integration tests that start the whole app with a fake AI and an in-memory database to check authentication, anti-forgery, privacy between players, security headers, the sign-in throttle, and that no real flag appears in public pages or scripts.
+
+### Operational limits and known trade-offs
+
+- Rate limiters and counters live in memory per app instance and reset on restart.
+- The free AI allowance is shared by all players (Google AI Studio free tier: 15 requests per minute and 500 per day for the chosen model, observed on Day 2); the app caps usage at 400 per day overall.
+- No database migrations; schema changes require a reset.
+- Render's free tier, Neon's free tier and Gemini's free models can change; verify them before relying on them again.

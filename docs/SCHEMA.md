@@ -226,3 +226,13 @@ public class ChatLog
 - `LevelAttempt` table to store every attempt outcome for analytics.
 - `UserProfile` (display name, avatar) and `Team` for CTF events.
 - EF Core migrations once the schema stabilizes.
+
+---
+
+## 11. As built (updated on Day 10)
+
+- **Production-only table:** `DataProtectionKeys` (`Id`, `FriendlyName`, `Xml`) is created by `EnsureCreated()` and used only when `Database:Provider` is `Postgres`. It stores the keys that protect login cookies and anti-forgery tokens, so users stay logged in across host restarts. It holds no personal data.
+- **Replays** are stored in `ChatLog` with `DefenseOn = true` and `IsReset = true`, so they count toward the daily quota but stay out of the visible conversation. A message stopped by an input guard never reaches the AI and is not stored.
+- **Leaderboard:** the ranking is computed in C# from `LevelProgress` joined to the user table (not by the SQL shown in section 4), which gives identical results on SQLite and Postgres. Players with zero points are excluded.
+- **Cleaning test data on the live database:** deleting a row from `AspNetUsers` also deletes that user's `LevelProgress` and `ChatLog` rows (cascade). Always include the `WHERE` clause.
+- **Resetting the schema:** there are no migrations. To change a table, drop the affected tables (or the whole database) and restart the app, which recreates them.

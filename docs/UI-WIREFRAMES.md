@@ -233,3 +233,16 @@ Stack order: scenario, hints, chat, flag, then explanation and defense after cap
 - Buttons and inputs are at least 44 px high on mobile.
 - Respect `prefers-reduced-motion` (no hover glow animation).
 - All icons have text labels or `aria-label`.
+
+---
+
+## 8. As built (updated on Day 10)
+
+All screens above exist. Differences from the sketches:
+
+- **Home:** hero with buttons that depend on login state (Get started and Log in, or Continue playing), a four-step "How it works" strip, then the 10 OWASP cards (7 with Open level buttons, 3 locked).
+- **Dashboard:** score out of 950 with a progress bar, one row per level with a status badge and points, "lighter" tags on levels 6 and 7.
+- **Level page:** the defense switch, Replay button, and explanation panel appear only after the flag is captured (they are absent from the page source until then). Hints already revealed stay visible after a refresh. Level 5 shows an output-token meter under the chat; Level 6 shows each new reply inside a sandboxed frame with the raw text below it.
+- **Leaderboard:** public, top 10 with medals for the first three, your row highlighted with a "you" badge, and your rank shown below the table if you are outside the top 10.
+- **About and Error pages:** a plain About page with scoring, ethical use and privacy notes; a friendly error page with a large status code and a reference id (no technical details).
+- **Navigation:** Home, Dashboard, Leaderboard, About, then Login and Register (or your name and Logout).

@@ -1,16 +1,16 @@
 # BreakTheBot — Project Structure
 
-> Version 1.0 · Legend: ✅ exists after Day 2 · 🔜 planned (day shown) · Target framework: net8.0
+> Version 1.0 · Legend: ✅ built · Target framework: net8.0 · Updated on Day 10 to match the finished app
 
 ## 1. Full folder tree
 
 ```
 BreakTheBot/                              ← repository root (C:\Projects\BreakTheBot)
 ├─ BreakTheBot.sln                        ✅ solution (groups web + tests)
-├─ README.md                              🔜 Day 9   public front page of the repo
-├─ LICENSE                                🔜 Day 9   MIT
-├─ Dockerfile                             🔜 Day 9   builds the production image
-├─ .dockerignore                          🔜 Day 9
+├─ README.md                              ✅   public front page of the repo
+├─ LICENSE                                ✅   MIT
+├─ Dockerfile                             ✅   builds the production image
+├─ .dockerignore                          ✅
 ├─ .gitignore                             ✅ keeps bin/obj/*.db/secrets out of Git
 │
 ├─ docs/                                  ✅ all documentation
@@ -30,12 +30,12 @@ BreakTheBot/                              ← repository root (C:\Projects\Break
 │     ├─ appsettings.json                 ✅ non-secret defaults (model, limits)
 │     ├─ appsettings.Development.json     ✅
 │     │
-│     ├─ Data/                            🔜 Day 3   persistence
+│     ├─ Data/                            ✅   persistence
 │     │  ├─ AppDbContext.cs                 EF Core + Identity context
 │     │  ├─ LevelProgress.cs                entity + LevelStatus enum
 │     │  └─ ChatLog.cs                      entity
 │     │
-│     ├─ Services/                        🔜 Day 3–8 application logic (no UI, no prompts)
+│     ├─ Services/                        ✅ application logic (no UI, no prompts)
 │     │  ├─ ILlmClient.cs                   AI contract and records
 │     │  ├─ GeminiClient.cs                 the only class that calls Gemini
 │     │  ├─ FlagService.cs                  per-user HMAC flags
@@ -45,7 +45,7 @@ BreakTheBot/                              ← repository root (C:\Projects\Break
 │     │  ├─ ToolExecutor.cs                 simulated tools for Level 4
 │     │  └─ LeaderboardService.cs           top-10 query
 │     │
-│     ├─ Levels/                          🔜 Day 4–7 one class per level (the "content")
+│     ├─ Levels/                          ✅ one class per level (the "content")
 │     │  ├─ ILevel.cs                       contract + LevelContext/LevelReply records
 │     │  ├─ LevelBase.cs                    shared helpers (flag matching, guards)
 │     │  ├─ LevelRegistry.cs                list of all levels, GetById
@@ -57,41 +57,40 @@ BreakTheBot/                              ← repository root (C:\Projects\Break
 │     │  ├─ Level6ReviewWidget.cs
 │     │  └─ Level7SecAdvisor.cs
 │     │
-│     ├─ Endpoints/                       🔜 Day 4–5 JSON API
+│     ├─ Endpoints/                       ✅ JSON API
 │     │  └─ LevelEndpoints.cs               chat, flag, hint, replay, reset
 │     │
 │     ├─ Pages/                           ✅ Razor Pages (server-rendered UI)
 │     │  ├─ Index.cshtml / .cs              ✅ home with 10 OWASP cards
-│     │  ├─ Dashboard.cshtml / .cs          🔜 Day 4
-│     │  ├─ Leaderboard.cshtml / .cs        🔜 Day 8
-│     │  ├─ About.cshtml / .cs              🔜 Day 8
+│     │  ├─ Dashboard.cshtml / .cs          ✅
+│     │  ├─ Leaderboard.cshtml / .cs        ✅
+│     │  ├─ About.cshtml / .cs              ✅
 │     │  ├─ Error.cshtml / .cs              ✅ template; customized Day 8
 │     │  ├─ Levels/
-│     │  │  └─ Play.cshtml / .cs            🔜 Day 4–5 the level screen
+│     │  │  └─ Play.cshtml / .cs            ✅ the level screen
 │     │  ├─ Shared/
 │     │  │  ├─ _Layout.cshtml               ✅ dark layout and navbar
-│     │  │  ├─ _LoginPartial.cshtml         🔜 Day 3
+│     │  │  ├─ _LoginPartial.cshtml         ✅
 │     │  │  └─ _ValidationScriptsPartial.cshtml ✅
 │     │  ├─ _ViewImports.cshtml             ✅
 │     │  └─ _ViewStart.cshtml               ✅
 │     │
-│     ├─ Areas/Identity/                  🔜 Day 3 (only if scaffolded pages are needed)
 │     │
 │     └─ wwwroot/                         ✅ static files served as-is
 │        ├─ css/site.css                    ✅ theme and component styles
-│        ├─ js/chat.js                      🔜 Day 4 chat UI logic
+│        ├─ js/chat.js                      ✅ chat UI logic
 │        ├─ js/site.js                      ✅ template file
 │        └─ lib/                            ✅ Bootstrap, jQuery (from template)
 │
 └─ tests/
    └─ BreakTheBot.Tests/                  ✅ xUnit project (references the web project)
-      ├─ FakeLlmClient.cs                 🔜 Day 4  scripted AI replies for tests
-      ├─ FlagServiceTests.cs              🔜 Day 3
-      ├─ ScoringServiceTests.cs           🔜 Day 3
-      ├─ UsageLimiterTests.cs             🔜 Day 4
-      ├─ Level1Tests.cs … Level7Tests.cs  🔜 Day 4–7  win detection and defenses
-      ├─ ToolExecutorTests.cs             🔜 Day 6
-      └─ LeaderboardTests.cs              🔜 Day 8
+      ├─ FakeLlmClient.cs                 ✅  scripted AI replies for tests
+      ├─ FlagServiceTests.cs              ✅
+      ├─ ScoringServiceTests.cs           ✅
+      ├─ UsageLimiterTests.cs             ✅
+      ├─ Level1Tests.cs … Level7Tests.cs  ✅  win detection and defenses
+      ├─ ToolExecutorTests.cs             ✅
+      └─ LeaderboardTests.cs              ✅
 ```
 
 ## 2. What each folder is responsible for
@@ -195,3 +194,17 @@ flowchart TB
 - Commit at the end of every build day with a message like `Day 3: accounts, data model, flags`.
 - Tag releases: `v0.9` (feature complete), `v1.0.0` (launch).
 - Never commit: API keys, the flag secret, connection strings with passwords, local databases.
+
+---
+
+## 9. As built (updated on Day 10)
+
+Everything in the tree above exists. Notes on what actually shipped:
+
+- **Identity pages** use the default UI package. Nothing was scaffolded, so there is no `Areas/Identity` folder.
+- **Dockerfile and .dockerignore** live at the repository root (they must be there for the host's build to find them).
+- **Tests** (about 327): `TestDb.cs`, `FakeLlmClient.cs`, `FlagServiceTests.cs`, `ScoringServiceTests.cs`, `UsageLimiterTests.cs`, `LevelEngineTests.cs`, `Level1Tests.cs`, `Level1DefenseTests.cs`, `Level2Tests.cs`, `Level3Tests.cs`, `Level4Tests.cs` (with the Level 3 and 4 loop tests), `LearningLoopTests.cs` (flag, hint, reset and replay), `ToolExecutorTests.cs`, `FinalLevelsTests.cs` (Levels 5 to 7), `LeaderboardTests.cs`, `IntegrationTestHost.cs` (starts the whole app with a fake AI and an in-memory database), and `SecurityTests.cs`.
+- **Services** also include `LeaderboardService.cs` and `ToolExecutor.cs`. `Level` classes depend only on `ILlmClient` (and `ToolExecutor` for Level 4), as designed.
+- **Level contract additions:** `TokenGoal` and `RendersHtml` on `ILevel`/`LevelBase`, and `Error`/`ErrorCode` on `LevelReply`.
+- **Program.cs** also holds the security headers, the rate limiters, forwarded headers, the production-only Data Protection key storage, and `/healthz`.
+- **Docs:** the planning documents are in `docs/planning/`, and screenshots in `docs/screenshots/`.
